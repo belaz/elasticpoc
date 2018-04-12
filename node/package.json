@@ -1,0 +1,9 @@
+{
+  "name": "elastictest",
+  "description": "Elastic > NodeJs tutorial",
+  "dependencies": {
+    "mysql": "^2.15.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  }
+}

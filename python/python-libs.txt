@@ -1,0 +1,4 @@
+setuptools
+wheel
+requests
+mysql-connector-python-rf
