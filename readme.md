@@ -33,7 +33,7 @@ install node modules (go to the project node folder and execute this)
 PS : if you have docker, you can go on a free ride on elasticsearch/mysql with the command
 `docker-compose up -d`
 
-In all case you have to configure the project with thie commands :
+Test the project with this commands :
 
 `
 cd node;
