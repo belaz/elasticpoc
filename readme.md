@@ -30,6 +30,11 @@ install node modules (go to the project node folder and execute this)
 
 **Where to start:**
 
+PS : if you have docker, you can go on a free ride on elasticsearch/mysql with the command
+`docker-compose up -d`
+
+In all case you have to configure the project with thie commands :
+
 `
 cd node;
 node insert-into-elastic.js`
