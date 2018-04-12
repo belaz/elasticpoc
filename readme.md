@@ -1,31 +1,52 @@
-To delete an index
+# STARTER PACK
 
-curl  -XDELETE "192.168.91.114:9200/bank"
+**Tools:**
 
-Data playground
+http://cmder.net/  (console)
 
-Quickplay ->
+https://chocolatey.org/  (packages)
 
-Import the datasample.json file at the root of this project (bulk insert)
+https://code.visualstudio.com/ (IDE)
 
-curl -H "Content-Type: application/json" -XPOST "192.168.91.114:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@datasample.json"
+https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64-webinstall.exe (PYTHON)
 
-curl "192.168.91.114:9200/_cat/indices?v"
+https://nodejs.org/en/ (nodejs)
 
-Realplay ->
+https://www.json-generator.com/ (generate json sample datas)
 
-generate some random json data here
+**Config:**
 
-https://www.json-generator.com/
+Install curl with chocolatey (in administrator console)
 
-Download and import the file (replace localhost by the elasticsearch ip)
+`chocolatey install curl`
 
-curl -H "Content-Type: application/json" -XPOST "192.168.91.114:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
-curl "192.168.91.114:9200/_cat/indices?v"
+Install python libs (go to the project python folder and execute this 2 times)
 
+`pip install --trusted-host pypi.python.org -r python-libs.txt`
 
-Python bootstrap 
+install node modules (go to the project node folder and execute this)
 
-go to the python folder and execute this 2 times 
+`node install`
 
-pip install --trusted-host pypi.python.org -r python-libs.txt
+**Where to start:**
+
+`
+cd node;
+node insert-into-elastic.js`
+
+`cd python;
+py insert-into-elastic.py`
+
+# USEFUL COMMANDS
+
+**Delete an index**
+
+`curl  -XDELETE "192.168.91.114:9200/bank"`
+
+**List all indexes**
+
+`curl "192.168.91.114:9200/_cat/indices?v"`
+
+**Bulk insert**
+
+`curl -H "Content-Type: application/json" -XPOST "192.168.91.114:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@datasample.json"`
