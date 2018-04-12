@@ -6,3 +6,13 @@ services:
         ports:
             - "9200:9200"
             - "9300:9300"
+    percona:
+        image: percona:latest
+        restart: always
+        environment:
+           MYSQL_USER: ac
+           MYSQL_PASSWORD: ac
+           MYSQL_ROOT_PASSWORD: ac
+           MYSQL_DATABASE: ac
+        ports:
+            - "3306:3306"
