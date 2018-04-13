@@ -46,12 +46,12 @@ py insert-into-elastic.py`
 
 **Delete an index**
 
-`curl  -XDELETE "192.168.91.114:9200/bank"`
+`curl  -XDELETE "127.0.0.1:9200/bank"`
 
 **List all indexes**
 
-`curl "192.168.91.114:9200/_cat/indices?v"`
+`curl "127.0.0.1:9200/_cat/indices?v"`
 
 **Bulk insert**
 
-`curl -H "Content-Type: application/json" -XPOST "192.168.91.114:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@datasample.json"`
+`curl -H "Content-Type: application/json" -XPOST "127.0.0.1:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@datasample.json"`
