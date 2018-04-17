@@ -26,7 +26,7 @@ Install python libs (go to the project python folder and execute this 2 times)
 
 install node modules (go to the project node folder and execute this)
 
-`node install`
+`npm install`
 
 **Where to start:**
 
