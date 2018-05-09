@@ -16,8 +16,11 @@ import time
         "city", "country", "job", "goal","tag"
 '''
 
-def get_query_dict(**kwargs):
+def get_query_dict(conf, **kwargs):
     ''' construct full text query '''
+
+    # get terms that shouldn't be used by fuzziness
+    fuzziness_terms_to_exclude = conf['fuzziness_terms_to_exclude']
 
     query = {}
     # full text on job
@@ -29,10 +32,21 @@ def get_query_dict(**kwargs):
             jobs = kwargs.get("job")
             query["bool"] = { "minimum_should_match": 1, "should": []}
             for ind_job in jobs:
-                query["bool"]["should"].append({"match":{"job":{"query": ind_job, "minimum_should_match": "2<75%"}}})
+                # individual job requested
+                if ind_job in fuzziness_terms_to_exclude:
+                    match_query = {"query": ind_job, "minimum_should_match": "2<75%"}
+                else:
+                    match_query = {"query": ind_job, "prefix_length": 3, "fuzziness": "AUTO", "minimum_should_match": "2<75%"}
+
+                query["bool"]["should"].append({"match":{"job":match_query}})
         else:
             # individual job requested
-            query["match"] = {"job":{"query": kwargs.get("job"), "minimum_should_match": "2<75%"}}
+            if kwargs.get("job") in fuzziness_terms_to_exclude:
+                match_query = {"query": kwargs.get("job"), "minimum_should_match": "2<75%"}
+            else:
+                match_query = {"query": kwargs.get("job"), "prefix_length": 3, "fuzziness": "AUTO", "minimum_should_match": "2<75%"}
+
+            query["match"] = {"job":match_query}
 
     else:
         # else match all
@@ -66,35 +80,40 @@ def get_filter_dict(**kwargs):
     return filt
 
 
-def construct_body_query(**kwargs):
+def construct_body_query(conf, highlight, **kwargs):
     ''' construct complete es query '''
 
     if len(kwargs) == 0:
         print("no inputs")
         return False
 
+    # final_dict = {"_source": ["fk_node_id"], "query": {"bool": {"must": {}}}}
+    final_dict = {"query": {"bool": {"must": {}}}}
+
     params_dict = kwargs
-    query_dict = get_query_dict(**params_dict)
+    query_dict = get_query_dict(conf, **params_dict)
     if "job" in params_dict.keys(): 
         params_dict.pop("job")
+        # add highlight information
+        if highlight:
+            final_dict["highlight"] = {"fields": {"job" : {}}}
 
     filter_dict = get_filter_dict(**params_dict)
-    
-    final_dict = {"_source": ["fk_node_id"], "query": {"bool": {"must": {}}}}
     final_dict["query"]["bool"]["must"] = query_dict["query"]
     if len(filter_dict["filter"]["bool"]) > 0:
         final_dict["query"]["bool"]["filter"] = filter_dict["filter"]
+
     return final_dict
 
 
-def elastic_search(es, index_name, doc_type_name, debug=0, **kwargs):
+def elastic_search(es, index_name, doc_type_name, conf, highlight=False, debug=0, **kwargs):
     ''' specific function to query elasticsearch with custom parameters '''
 
     # construct json body query and request results
-    body = construct_body_query(**kwargs)
-    res = es.search(index = index_name, doc_type = doc_type_name, size=1, body=body)
+    body = construct_body_query(conf, highlight, **kwargs)
+    res = es.search(index = index_name, doc_type = doc_type_name, size=10, body=body)
 
-    if debug > 0: 
+    if debug > 0:
         print("Query:")
         pprint(body)
         print("\nNumber of results: {}".format(str(res['hits']['total'])))
@@ -141,7 +160,7 @@ def automatic_search(es, index_name, doc_type_name, file_scopes='', debug=0):
     # integrate results to tsv
     df["nb_results"] = nb_results
     df["errors"] = errors
-    
+
     print("Processed {}%".format(str(100)))
     print("Done")
     print("--- %s seconds ---\n" % (time.time() - start_time))
@@ -157,10 +176,10 @@ doc_type_name = "users"
 
 # create elasticsearch object
 es = Elasticsearch([{'host': "192.168.91.193", 'port': "9200"}])
+# load configuration
+with open('conf.json') as data_file:
+    conf = json.load(data_file)
 
 # construct json body query and request results on a SEPECIFIC SCOPE
-res = elastic_search(es, index_name=index_name, doc_type_name=doc_type_name, job="student", city="Paris")
+res = elastic_search(es, debug=1, index_name=index_name, doc_type_name=doc_type_name, conf=conf, job="student", city="Paris")
 
-# generate AUTOMATIC results from a tsv file
-file_scopes = '../automatic_search_template_es_python.tsv'
-automatic_search(es, index_name=index_name, doc_type_name=doc_type_name, file_scopes=file_scopes)
